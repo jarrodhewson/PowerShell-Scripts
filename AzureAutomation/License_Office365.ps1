@@ -71,6 +71,7 @@ if(($UserCount -eq 0) -or ($UserCount -eq $null)){
 foreach($UserUPN in $LicenseUsers){
     $isLicenseApplied=$false
     $onlineUser = Get-MsolUser -UserPrincipalName $UserUPN
+    $isUserSignInBlocked = $onlineUser.BlockCredential
     #Check if licensed
     if($onlineUser.IsLicensed -eq $false){
         # Check Usage location first
@@ -85,8 +86,18 @@ foreach($UserUPN in $LicenseUsers){
         }
     }
     if(!$isLicenseApplied){
-         #Set-MsolUserLicense -UserPrincipalName $UserUPN -AddLicense $LicenseName -LicenseOptions $LicenseOptions
-         "TEST - Applying $LicenseName License - $UserUPN"
+        if($isUserSignInBlocked){
+            "User Sign In Blocked - $UserUPN - not trying to apply licence"
+        } else {
+            try{
+                #Set-MsolUserLicense -UserPrincipalName $UserUPN -AddLicense $LicenseName -LicenseOptions $LicenseOptions -ErrorAction Stop
+                "TEST - Applying $LicenseName License - $UserUPN"
+            }
+            Catch {
+                $ErrorMsg = $_.Exception.Message
+                "Error Applying $LicenseName License - $UserUPN - $ErrorMsg"
+            }
+        }
     }
 }
 
@@ -113,7 +124,13 @@ $UserCountUnLicense = $LicensesToRemove.count
 <#
 # Remove licenses from users not in group
 foreach($UserUPN in $LicensesToRemove){
-    #Set-MsolUserLicense -UserPrincipalName $UserUPN -RemoveLicenses $LicenseName 
-    "TEST - Removing $LicenseName License - $UserUPN"
+    try {
+        #Set-MsolUserLicense -UserPrincipalName $UserUPN -RemoveLicenses $LicenseName -ErrorAction Stop
+        "TEST - Removing $LicenseName License - $UserUPN"
+    }
+    Catch {
+        $ErrorMsg = $_.Exception.Message
+        "Error Removing $LicenseName License - $UserUPN - $ErrorMsg"
+    }
 }
 #>
