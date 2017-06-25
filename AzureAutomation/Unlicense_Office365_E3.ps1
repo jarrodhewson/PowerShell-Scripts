@@ -126,8 +126,8 @@ $UserCountUnLicense = $LicensesToRemove.count
 # Remove licenses from users not in group
 foreach($UserUPN in $LicensesToRemove){
     try {
-        #Set-MsolUserLicense -UserPrincipalName $UserUPN -RemoveLicenses $LicenseName -ErrorAction Stop
-        "TEST - Removing $LicenseName License - $UserUPN"
+        Set-MsolUserLicense -UserPrincipalName $UserUPN -RemoveLicenses $LicenseName -ErrorAction Stop
+        "Removing $LicenseName License - $UserUPN"
     }
     Catch {
         $ErrorMsg = $_.Exception.Message
