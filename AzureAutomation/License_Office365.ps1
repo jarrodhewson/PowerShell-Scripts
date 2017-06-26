@@ -90,8 +90,8 @@ foreach($UserUPN in $LicenseUsers){
             "User Sign In Blocked - $UserUPN - not trying to apply licence"
         } else {
             try{
-                #Set-MsolUserLicense -UserPrincipalName $UserUPN -AddLicense $LicenseName -LicenseOptions $LicenseOptions -ErrorAction Stop
-                "TEST - Applying $LicenseName License - $UserUPN"
+                Set-MsolUserLicense -UserPrincipalName $UserUPN -AddLicense $LicenseName -LicenseOptions $LicenseOptions -ErrorAction Stop
+                "Applying $LicenseName License - $UserUPN"
             }
             Catch {
                 $ErrorMsg = $_.Exception.Message
