@@ -4,6 +4,7 @@ Connect-MSOLService –Credential $O365Cred
 $LicenseGroup = "CloudLicense_PowerBIPro"
 $LicenseName = "Lexel1:POWER_BI_PRO"
 $LicenseOptions = New-MsolLicenseOptions –AccountSkuId $LicenseName -DisabledPlans $null
+$percentLimit = 10
 
 $LicenseUsers = @()
 $currentLicensedUsers = @()
@@ -66,6 +67,18 @@ $UserCount = $LicenseUsers.count
 if(($UserCount -eq 0) -or ($UserCount -eq $null)){
     "User count null or zero - exiting script"
     break
+}
+
+$percentAllocated = [math]::Round($UserCount/$LicenseActive*100)
+$percentRemain = [math]::Round(100-($UserCount/$LicenseActive*100))
+$licenceRemain = $LicenseActive - $UserCount
+if($licenceRemain -lt 0){
+    "Warning! Not enough licenses!"
+}
+if($percentAllocated -ge (100-$percentLimit)){
+    "Warning! Less than $percentLimit% licenses remaining ($percentRemain% - $licenceRemain licenses)"
+} else {
+    "$percentRemain% licenses remaining ($licenceRemain licenses)"
 }
 
 # Check if each user is licensed and apply new license
